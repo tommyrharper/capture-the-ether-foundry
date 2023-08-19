@@ -25,6 +25,7 @@ contract GuessNewNumberTest is Test {
 
         // Place your solution here
         guessNewNumber.guess{value: 1 ether}(exploitContract.Exploit());
+        _checkSolved();
     }
 
     function _checkSolved() internal {
